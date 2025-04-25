@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
-import fs from "fs"
+import fs from "fs";
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./uploads");
@@ -144,6 +144,7 @@ app.post("/api/v1/sendcontactformmail", (req, res) => {
       }
     });
   } catch (err) {
+    console.log("Error in contactformmail", err);
     return res.json({
       success: false,
       message: "Internal Server Error",
@@ -278,7 +279,7 @@ app.post("/api/v1/senddropshippingformmail", (req, res) => {
       }
     });
   } catch (err) {
-    console.log(err);
+    console.log("Error in dropshippingformmail", err);
     return res.json({
       success: false,
       message: "Internal Server Error",
@@ -392,7 +393,7 @@ app.post("/api/v1/sendwebappmail", (req, res) => {
       }
     });
   } catch (err) {
-    console.log(err);
+    console.log("Error in webappcontroller", err);
     return res.json({
       success: false,
       message: "Internal Server Error",
@@ -486,6 +487,7 @@ app.post("/api/v1/sendmobileappmail", (req, res) => {
       }
     });
   } catch (err) {
+    console.log("Error in mobileappmail", err);
     return res.json({
       success: false,
       message: "Internal Server Error",
@@ -585,7 +587,7 @@ app.post("/api/v1/influencer", (req, res) => {
       }
     });
   } catch (err) {
-    console.log(err);
+    console.log("Error in influencermail", err);
     return res.json({
       success: false,
       message: "Internal Server Error",
@@ -768,6 +770,7 @@ app.post("/api/v1/sendaimail", (req, res) => {
       }
     });
   } catch (err) {
+    console.log("Error in aiformmail", err);
     return res.json({
       success: false,
       message: "Internal Server Error",
@@ -861,6 +864,7 @@ app.post("/api/v1/sendcareer", upload.single("file"), (req, res) => {
       }
     });
   } catch (err) {
+    console.log("Error in carrerformmail", err);
     return res.json({
       success: false,
       message: "Internal Server Error",
@@ -964,6 +968,7 @@ app.post("/api/v1/commonform", (req, res) => {
       }
     });
   } catch (err) {
+    console.log("Error in commonformmail", err);
     return res.json({
       success: false,
       message: "Internal Server Error",
