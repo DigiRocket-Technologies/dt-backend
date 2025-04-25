@@ -6,19 +6,11 @@ import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./uploads");
-  },
-  filename: function (req, file, cb) {
-    const uniquePrefix = uuidv4();
-    cb(null, uniquePrefix + "-" + file.originalname);
-  },
-});
-
 const upload = multer({
-  storage: storage,
-  limits: { fileSize: 50 * 1024 * 1024 },
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB in bytes
+  },
 });
 
 dotenv.config();
@@ -827,18 +819,14 @@ app.post("/api/v1/sendcareer", upload.single("file"), (req, res) => {
     </div>`,
       attachments: [
         {
-          filename: resume.originalname, // Original file name (e.g., resume.pdf)
-          path: resume.path, // Path to the uploaded file
+          filename: resume.originalname,
+          content: resume.buffer, // <-- use buffer instead of path
+          contentType: resume.mimetype, // Path to the uploaded file
         },
       ],
     };
 
     auth.sendMail(receiver, (err, emailResponse) => {
-      try {
-        fs.unlinkSync(resume.path);
-      } catch (unlinkErr) {
-        console.log("Error deleting file:", unlinkErr);
-      }
 
       if (err) {
         return res.json({
