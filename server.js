@@ -5,6 +5,7 @@ import nodemailer from "nodemailer";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./uploads");
@@ -29,15 +30,13 @@ const upload = multer({
       cb(new Error("Only PDF and Word documents are allowed"), false);
     }
   },
-  limits: { fileSize: 10 * 1024 * 1024 }, // Limit file size to 5MB
+  limits: { fileSize: 10 * 1024 * 1024 },
 });
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 8000;
-
-console.log(process.env.FRONTEND_URL);
 
 app.use(
   cors({
@@ -334,7 +333,7 @@ app.post("/api/v1/sendwebappmail", (req, res) => {
     const receiver = {
       from: process.env.GMAIL_ACCOUNT,
       to: process.env.TO,
-      cc: [process.env.CC1, process.env.CC2],
+      cc: [process.env.CC1, process.env.CC2,process.env.CC3,process.env.CC4],
       subject: subject,
       html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;">
       <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 500px; margin: auto;">
@@ -439,7 +438,7 @@ app.post("/api/v1/sendmobileappmail", (req, res) => {
     const receiver = {
       from: process.env.GMAIL_ACCOUNT,
       to: process.env.TO,
-      cc: [process.env.CC1, process.env.CC2],
+      cc: [process.env.CC1, process.env.CC2,process.env.CC3,process.env.CC4],
       subject: subject,
       html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;">
   <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 500px; margin: auto;">
@@ -534,7 +533,7 @@ app.post("/api/v1/influencer", (req, res) => {
     const receiver = {
       from: process.env.GMAIL_ACCOUNT,
       to: process.env.TO,
-      cc: [process.env.CC1, process.env.CC2],
+      cc: [process.env.CC1, process.env.CC2,process.env.CC3,process.env.CC4],
       subject: subject,
       html: `<div style="font-family: Arial, sans-serif; background-color: #f0f0f0; padding: 20px; margin: 0;">
   <div style="background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); max-width: 550px; margin: auto;">
@@ -634,7 +633,7 @@ app.post("/api/v1/ecommerce", (req, res) => {
     const receiver = {
       from: process.env.GMAIL_ACCOUNT,
       to: process.env.TO,
-      cc: [process.env.CC1, process.env.CC2],
+      cc: [process.env.CC1, process.env.CC2,process.env.CC3,process.env.CC4],
       subject: subject,
       html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;">
       <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 500px; margin: auto;">
@@ -818,7 +817,7 @@ app.post("/api/v1/sendcareer", upload.single("file"), (req, res) => {
     const receiver = {
       from: process.env.GMAIL_ACCOUNT,
       to: process.env.TO,
-      cc: [process.env.CC1, process.env.CC2],
+      cc: [process.env.CC1, process.env.CC2,process.env.CC3,process.env.CC4],
       subject: subject,
       html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;">
       <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 500px; margin: auto;">
@@ -918,7 +917,7 @@ app.post("/api/v1/commonform", (req, res) => {
     const receiver = {
       from: process.env.GMAIL_ACCOUNT,
       to: process.env.TO,
-      cc: [process.env.CC1, process.env.CC2],
+      cc: [process.env.CC1, process.env.CC2,process.env.CC3,process.env.CC4],
       subject: subject,
       html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;">
       <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 500px; margin: auto;">
