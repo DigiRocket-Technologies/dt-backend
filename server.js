@@ -37,11 +37,13 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+console.log(process.env.FRONTEND_URL);
+
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
-    allowedHeaders: ["Content-Type","Accept-Type"],
-    methods: ["GET","POST"]
+    allowedHeaders: ["Content-Type", "Accept-Type"],
+    methods: ["GET", "POST"],
   })
 );
 
@@ -688,10 +690,7 @@ app.post("/api/v1/ecommerce", (req, res) => {
 app.post("/api/v1/sendaimail", (req, res) => {
   try {
     const { name, email, phone, aiService, additional } = req.body;
-    
 
-    console.log(req.body);
-    return ;
     if (!name || !phone || !aiService || !email) {
       return res.status(400).json({
         success: false,
