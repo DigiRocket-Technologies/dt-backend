@@ -848,12 +848,13 @@ app.post("/api/v1/sendcareer", upload.single("file"), (req, res) => {
     };
 
     auth.sendMail(receiver, (err, emailResponse) => {
+
       try {
         fs.unlinkSync(resume.path);
       } catch (unlinkErr) {
-        console.error("Error deleting file:", unlinkErr);
+        console.log("Error deleting file:", unlinkErr);
       }
-      
+
       if (err) {
         return res.json({
           success: false,
