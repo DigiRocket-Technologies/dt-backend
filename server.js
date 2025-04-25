@@ -16,21 +16,9 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({
+export const upload = multer({
   storage: storage,
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ];
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error("Only PDF and Word documents are allowed"), false);
-    }
-  },
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 50 * 1024 * 1024 },
 });
 
 dotenv.config();
@@ -45,8 +33,6 @@ app.use(
     methods: ["GET", "POST"],
   })
 );
-
-app.use("/uploads", express.static("uploads"));
 
 app.use(express.json({ limit: "10mb" }));
 
@@ -848,7 +834,6 @@ app.post("/api/v1/sendcareer", upload.single("file"), (req, res) => {
     };
 
     auth.sendMail(receiver, (err, emailResponse) => {
-
       try {
         fs.unlinkSync(resume.path);
       } catch (unlinkErr) {
