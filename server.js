@@ -29,6 +29,8 @@ app.use(
 
 app.use(express.json({ limit: "10mb" }));
 
+connectDB();
+
 app.use("/api/v1/blog",blogRoutes)
 
 app.get("/", (req, res) => {
@@ -990,10 +992,7 @@ app.post("/api/v1/login", (req, res) => {
   }
 })
 
+app.listen(PORT,  () => {
 
-
-
-app.listen(PORT,  (req, res) => {
-  connectDB();
   console.log(`Server is running at ${PORT}`);
 });
