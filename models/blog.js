@@ -25,6 +25,6 @@ const blogSchema = new mongoose.Schema({
   }
 }, { timestamps: true }); // adds createdAt and updatedAt automatically
 
-const blog = mongoose.model('Blog', blogSchema);
+const Blog = mongoose.model('Blog', blogSchema);
 
-export default blog
+export default Blog
