@@ -1007,6 +1007,8 @@ app.get("/api/v1/getallblogsadmin", protectedRoute, async (req, res) => {
 
     const blogs = await Blog.find({});
 
+    console.log(blogs);
+
     return res.status(200).json({
       success: true,
       message: 'User logged in successfully',
@@ -1217,7 +1219,7 @@ app.put("/api/v1/altervisibility",protectedRoute, async (req, res) => {
 })
 
 
-app.listen(PORT, (req, res) => {
-  connectDB();
+app.listen(PORT, async (req, res) => {
+  await connectDB();
   console.log(`Server is running at ${PORT}`);
 });
