@@ -3,8 +3,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import multer from "multer";
-import { v4 as uuidv4 } from "uuid";
-import fs from "fs";
+import jwt from "jsonwebtoken"
+import mongoose from "mongoose";
+import Blog from "./models/blog.js"
+import {protectedRoute} from "./middlewares/protectedRoute.js";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -21,12 +23,25 @@ const PORT = process.env.PORT || 8000;
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
-    allowedHeaders: ["Content-Type", "Accept-Type"],
-    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Accept-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT"],
   })
 );
 
 app.use(express.json({ limit: "10mb" }));
+
+const connectDB = async () => {
+  try {
+    await mongoose.connect(
+      process.env.MONGO_URI,
+    );
+    console.log("MongoDB connected successfully");
+  } catch (error) {
+    console.error("MongoDB connection error:", error);
+    process.exit(1);
+  }
+};
+
 
 app.get("/", (req, res) => {
   res.send("Hello World");
@@ -68,7 +83,7 @@ app.post("/api/v1/sendcontactformmail", (req, res) => {
     const receiver = {
       from: process.env.GMAIL_ACCOUNT,
       to: process.env.TO,
-      cc: [process.env.CC1, process.env.CC2, process.env.CC3, process.env.CC4,process.env.CC5],
+      cc: [process.env.CC1, process.env.CC2, process.env.CC3, process.env.CC4, process.env.CC5],
       subject: subject,
       html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;">
       <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 500px; margin: auto;">
@@ -192,7 +207,7 @@ app.post("/api/v1/senddropshippingformmail", (req, res) => {
     const receiver = {
       from: process.env.GMAIL_ACCOUNT,
       to: process.env.TO,
-      cc: [process.env.CC1, process.env.CC2, process.env.CC3, process.env.CC4,process.env.CC5],
+      cc: [process.env.CC1, process.env.CC2, process.env.CC3, process.env.CC4, process.env.CC5],
       subject: subject,
       html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;">
       <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 500px; margin: auto;">
@@ -205,9 +220,8 @@ app.post("/api/v1/senddropshippingformmail", (req, res) => {
     
         <div style="margin-bottom: 15px; padding: 10px; background-color: #f9f9f9; border-left: 4px solid #4CAF50; border-radius: 4px;">
           <div style="font-weight: bold; color: #555555;">Company Name:</div>
-          <div style="color: #333333; margin-top: 5px;">${
-            question2Details ? question2Details : "NA"
-          }</div>
+          <div style="color: #333333; margin-top: 5px;">${question2Details ? question2Details : "NA"
+        }</div>
         </div>
     
         <div style="margin-bottom: 15px; padding: 10px; background-color: #f9f9f9; border-left: 4px solid #4CAF50; border-radius: 4px;">
@@ -223,11 +237,9 @@ app.post("/api/v1/senddropshippingformmail", (req, res) => {
         <div style="margin-bottom: 15px; padding: 10px; background-color: #f9f9f9; border-left: 4px solid #4CAF50; border-radius: 4px;">
           <div style="font-weight: bold; color: #555555;">Website:</div>
           <div style="color: #333333; margin-top: 5px;">
-            <a href="${
-              question1Details ? question1Details : "#"
-            }" target="_blank" style="color: #1a73e8; text-decoration: none;">${
-        question1Details ? question1Details : "NA"
-      }</a>
+            <a href="${question1Details ? question1Details : "#"
+        }" target="_blank" style="color: #1a73e8; text-decoration: none;">${question1Details ? question1Details : "NA"
+        }</a>
           </div>
         </div>
     
@@ -311,7 +323,7 @@ app.post("/api/v1/sendwebappmail", (req, res) => {
     const receiver = {
       from: process.env.GMAIL_ACCOUNT,
       to: process.env.TO,
-      cc: [process.env.CC1, process.env.CC2, process.env.CC3, process.env.CC4,process.env.CC5],
+      cc: [process.env.CC1, process.env.CC2, process.env.CC3, process.env.CC4, process.env.CC5],
       subject: subject,
       html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;">
       <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 500px; margin: auto;">
@@ -342,17 +354,15 @@ app.post("/api/v1/sendwebappmail", (req, res) => {
         <div style="margin-bottom: 15px; padding: 10px; background-color: #f9f9f9; border-left: 4px solid #4CAF50; border-radius: 4px;">
           <div style="font-weight: bold; color: #555555;">Website Type:</div>
           <div style="color: #333333; margin-top: 5px;">
-            <div style="color: #333333; margin-top: 5px;">${
-              websiteType === "Others" ? otherWebsiteType : websiteType
-            }</div>
+            <div style="color: #333333; margin-top: 5px;">${websiteType === "Others" ? otherWebsiteType : websiteType
+        }</div>
           </div>
         </div>
     
         <div style="margin-bottom: 15px; padding: 10px; background-color: #f9f9f9; border-left: 4px solid #4CAF50; border-radius: 4px;">
           <div style="font-weight: bold; color: #555555;">Additional Info:</div>
-          <div style="color: #333333; margin-top: 5px;">${
-            additional ? additional : "NA"
-          }</div>
+          <div style="color: #333333; margin-top: 5px;">${additional ? additional : "NA"
+        }</div>
         </div>
       </div>
     </div>`,
@@ -416,7 +426,7 @@ app.post("/api/v1/sendmobileappmail", (req, res) => {
     const receiver = {
       from: process.env.GMAIL_ACCOUNT,
       to: process.env.TO,
-      cc: [process.env.CC1, process.env.CC2, process.env.CC3, process.env.CC4,process.env.CC5],
+      cc: [process.env.CC1, process.env.CC2, process.env.CC3, process.env.CC4, process.env.CC5],
       subject: subject,
       html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;">
   <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 500px; margin: auto;">
@@ -444,9 +454,8 @@ app.post("/api/v1/sendmobileappmail", (req, res) => {
 
     <div style="margin-bottom: 15px; padding: 10px; background-color: #f9f9f9; border-left: 4px solid #4CAF50; border-radius: 4px;">
       <div style="font-weight: bold; color: #555555;">Additional Info:</div>
-      <div style="color: #333333; margin-top: 5px;">${
-        additional ? additional : "NA"
-      }</div>
+      <div style="color: #333333; margin-top: 5px;">${additional ? additional : "NA"
+        }</div>
     </div>
   </div>
 </div>`,
@@ -511,7 +520,7 @@ app.post("/api/v1/influencer", (req, res) => {
     const receiver = {
       from: process.env.GMAIL_ACCOUNT,
       to: process.env.TO,
-      cc: [process.env.CC1, process.env.CC2, process.env.CC3, process.env.CC4,process.env.CC5],
+      cc: [process.env.CC1, process.env.CC2, process.env.CC3, process.env.CC4, process.env.CC5],
       subject: subject,
       html: `<div style="font-family: Arial, sans-serif; background-color: #f0f0f0; padding: 20px; margin: 0;">
   <div style="background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); max-width: 550px; margin: auto;">
@@ -535,19 +544,17 @@ app.post("/api/v1/influencer", (req, res) => {
     <div style="margin-bottom: 15px; padding: 12px; background-color: #f8f8f8; border-left: 4px solid #3498db; border-radius: 5px;">
       <div style="font-weight: bold; color: #4a4a4a;">Platforms:</div>
       <div style="color: #2c3e50; margin-top: 5px;">
-        ${
-          socialMedia && socialMedia.length > 0
-            ? socialMedia.join(", ")
-            : "None"
+        ${socialMedia && socialMedia.length > 0
+          ? socialMedia.join(", ")
+          : "None"
         }
       </div>
     </div>
 
     <div style="margin-bottom: 15px; padding: 12px; background-color: #f8f8f8; border-left: 4px solid #3498db; border-radius: 5px;">
       <div style="font-weight: bold; color: #4a4a4a;">Additional Info:</div>
-      <div style="color: #2c3e50; margin-top: 5px;">${
-        additional ? additional : "Not Provided"
-      }</div>
+      <div style="color: #2c3e50; margin-top: 5px;">${additional ? additional : "Not Provided"
+        }</div>
     </div>
   </div>
 </div>`,
@@ -611,7 +618,7 @@ app.post("/api/v1/ecommerce", (req, res) => {
     const receiver = {
       from: process.env.GMAIL_ACCOUNT,
       to: process.env.TO,
-      cc: [process.env.CC1, process.env.CC2, process.env.CC3, process.env.CC4,process.env.CC5],
+      cc: [process.env.CC1, process.env.CC2, process.env.CC3, process.env.CC4, process.env.CC5],
       subject: subject,
       html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;">
       <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 500px; margin: auto;">
@@ -635,9 +642,8 @@ app.post("/api/v1/ecommerce", (req, res) => {
       
         <div style="margin-bottom: 15px; padding: 10px; background-color: #f9f9f9; border-left: 4px solid #4CAF50; border-radius: 4px;">
           <div style="font-weight: bold; color: #555555;">Describe Your Query :</div>
-          <div style="color: #333333; margin-top: 5px;">${
-            additional ? additional : "NA"
-          }</div>
+          <div style="color: #333333; margin-top: 5px;">${additional ? additional : "NA"
+        }</div>
         </div>
       </div>
     </div>`,
@@ -700,7 +706,7 @@ app.post("/api/v1/sendaimail", (req, res) => {
     const receiver = {
       from: process.env.GMAIL_ACCOUNT,
       to: process.env.TO,
-      cc: [process.env.CC1, process.env.CC2, process.env.CC3, process.env.CC4,process.env.CC5],
+      cc: [process.env.CC1, process.env.CC2, process.env.CC3, process.env.CC4, process.env.CC5],
       subject: subject,
       html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;">
       <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 500px; margin: auto;">
@@ -728,9 +734,8 @@ app.post("/api/v1/sendaimail", (req, res) => {
     
         <div style="margin-bottom: 15px; padding: 10px; background-color: #f9f9f9; border-left: 4px solid #4CAF50; border-radius: 4px;">
           <div style="font-weight: bold; color: #555555;">Additional Info:</div>
-          <div style="color: #333333; margin-top: 5px;">${
-            additional ? additional : "NA"
-          }</div>
+          <div style="color: #333333; margin-top: 5px;">${additional ? additional : "NA"
+        }</div>
         </div>
       </div>
     </div>`,
@@ -795,7 +800,7 @@ app.post("/api/v1/sendcareer", upload.single("file"), (req, res) => {
     const receiver = {
       from: process.env.GMAIL_ACCOUNT,
       to: process.env.TO,
-      cc: [process.env.CC1, process.env.CC2, process.env.CC3, process.env.CC4,process.env.CC5],
+      cc: [process.env.CC1, process.env.CC2, process.env.CC3, process.env.CC4, process.env.CC5],
       subject: subject,
       html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;">
       <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 500px; margin: auto;">
@@ -892,7 +897,7 @@ app.post("/api/v1/commonform", (req, res) => {
     const receiver = {
       from: process.env.GMAIL_ACCOUNT,
       to: process.env.TO,
-      cc: [process.env.CC1, process.env.CC2, process.env.CC3, process.env.CC4,process.env.CC5],
+      cc: [process.env.CC1, process.env.CC2, process.env.CC3, process.env.CC4, process.env.CC5],
       subject: subject,
       html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;">
       <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 500px; margin: auto;">
@@ -953,6 +958,266 @@ app.post("/api/v1/commonform", (req, res) => {
   }
 });
 
+app.post("/api/v1/login", (req, res) => {
+
+  try {
+
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: "Password can't be empty"
+      })
+    }
+
+    if (password !== process.env.PASSWORD) {
+      return res.status(400).json({
+        success: false,
+        message: "Wrong Password"
+      })
+    }
+
+    const token = jwt.sign(
+      {
+        user: "admin"
+      },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: '7d' }
+    );
+
+
+    return res.status(200).json({
+      success: true,
+      message: 'User logged in successfully',
+      token
+    })
+
+  } catch (err) {
+    console.log('Error in login controller', err)
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    })
+  }
+})
+
+app.get("/api/v1/getallblogsadmin", protectedRoute, async (req, res) => {
+  try {
+
+    const blogs = await Blog.find({});
+
+    return res.status(200).json({
+      success: true,
+      message: 'User logged in successfully',
+      blogs
+    })
+
+  } catch (err) {
+    console.log('Error in get blogs controller', err)
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    })
+  }
+})
+
+app.get("/api/v1/getallblogs", async (req, res) => {
+  try {
+
+    const blogs = await Blog.find({live:true});
+
+    return res.status(200).json({
+      success: true,
+      message: 'User logged in successfully',
+      blogs
+    })
+
+  } catch (err) {
+    console.log('Error in get blogs controller', err)
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    })
+  }
+})
+
+app.get("/api/v1/getblogdetails/:id", async (req, res) => {
+  try {
+    const id = req.params.id
+
+    if (!id)
+      return res.status(400).json({
+        success: false,
+        message: 'No blog choosen '
+      })
+
+    const blog = await Blog.findOne({ _id: id });
+
+    return res.status(200).json({
+      success: true,
+      message: 'User logged in successfully',
+      blog
+    })
+
+  } catch (err) {
+    console.log('Error in get blogs controller', err)
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    })
+  }
+})
+
+app.post("/api/v1/addblog",protectedRoute, async (req, res) => {
+  try {
+    const { content, formData } = req.body
+
+    const { title, metaDescription = "", scriptTags = [],
+      thumbnail = "" } = formData
+
+    if (!title || !content) {
+      return res.status(200).json({
+        success: false,
+        message: 'title and content are necessary to save blog',
+      })
+    }
+
+    const blog = new Blog({
+      title,
+      thumbnail,
+      content,
+      metaDescription,
+      scriptTags
+    })
+
+    await blog.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Blog added successfully',
+
+    })
+
+  } catch (err) {
+    console.log('Error in add blog controller', err)
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    })
+  }
+})
+
+app.put("/api/v1/editblogdetails",protectedRoute, async (req, res) => {
+  try {
+    const { content, formData, id } = req.body
+
+    const { title, metaDescription = "", scriptTags = [],
+      thumbnail = "" } = formData
+
+    if (!id) {
+      return res.status(200).json({
+        success: false,
+        message: 'No blog choosen to edit',
+      })
+    }
+
+
+    if (!title || !content) {
+      return res.status(200).json({
+        success: false,
+        message: 'title and content are necessary to save blog',
+      })
+    }
+
+    const blog = await Blog.findOneAndUpdate({ _id: id }, {
+      title,
+      thumbnail,
+      content,
+      metaDescription,
+      scriptTags
+    })
+
+    return res.status(200).json({
+      success: true,
+      message: 'Blog edited sucessfully',
+      blog
+    })
+
+  } catch (err) {
+    console.log('Error in edit blog controller', err)
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    })
+  }
+})
+
+app.delete("/api/v1/deleteblog",protectedRoute, async (req, res) => {
+  try {
+    const {id } = req.body
+
+    if (!id) {
+      return res.status(200).json({
+        success: false,
+        message: 'No blog choosen to delete',
+      })
+    }
+
+    const blog = await Blog.findOneAndDelete({ _id: id })
+
+    return res.status(200).json({
+      success: true,
+      message: 'Blog deleted sucessfully',
+      blog
+    })
+
+  } catch (err) {
+    console.log('Error in delete blog controller', err)
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    })
+  }
+})
+
+app.put("/api/v1/altervisibility",protectedRoute, async (req, res) => {
+  try {
+    const {id } = req.body
+
+    if (!id) {
+      return res.status(200).json({
+        success: false,
+        message: 'No blog choosen to alter visibilty',
+      })
+    }
+
+    const blog = await Blog.findOne({_id:id})
+
+    if(blog?.live===false)
+    blog.live=true;
+    else 
+    blog.live=false;  
+    
+    await blog.save();
+    
+    return res.status(200).json({
+      success: true,
+      message: 'Blogs visibility altered sucessfully',
+      blog
+    })
+
+  } catch (err) {
+    console.log('Error in alter blog visibilty controller', err)
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    })
+  }
+})
+
+
 app.listen(PORT, (req, res) => {
+  connectDB();
   console.log(`Server is running at ${PORT}`);
 });
