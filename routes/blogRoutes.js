@@ -13,5 +13,4 @@ router.put("/editblogdetails",protectedRoute,editblogdetails);
 router.delete("/deleteblog",protectedRoute,deleteblog);
 router.put("/altervisibility",protectedRoute,altervisibility)
 
-
 export default router
