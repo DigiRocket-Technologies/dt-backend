@@ -7,7 +7,7 @@ const router=express.Router();
 
 router.get("/getallblogsadmin",protectedRoute,getallblogsadmin);
 router.get("/getallblogs",getallblogs);
-router.get("/getblogdetails/:id",getblogdetails);
+router.get("/getblogdetails/:slug",getblogdetails);
 router.post("/addblog",protectedRoute,addblog)
 router.put("/editblogdetails",protectedRoute,editblogdetails);
 router.delete("/deleteblog",protectedRoute,deleteblog);

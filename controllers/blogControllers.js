@@ -46,19 +46,20 @@ export const getallblogs=async (req, res) => {
 
 export const getblogdetails=async (req, res) => {
     try {
-        const id = req.params.id
-
-        if (!id)
+        const slug = req.params.slug
+        if (!slug)
             return res.status(400).json({
                 success: false,
                 message: 'No blog choosen '
             })
 
-        const blog = await Blog.findOne({ _id: id });
+        const blog = await Blog.findOne({ slug });
+
+
 
         return res.status(200).json({
             success: true,
-            message: 'User logged in successfully',
+            message: 'Blog details fetched successfully',
             blog
         })
 
@@ -76,9 +77,9 @@ export const addblog=async (req, res) => {
         const { content, formData } = req.body
 
         const { title, metaDescription = "", scriptTags = [],
-            thumbnail = "" } = formData
+            thumbnail = "",slug, heading="" } = formData
 
-        if (!title || !content) {
+        if (!title || !content|| !slug) {
             return res.status(200).json({
                 success: false,
                 message: 'title and content are necessary to save blog',
@@ -89,6 +90,8 @@ export const addblog=async (req, res) => {
             title,
             thumbnail,
             content,
+            slug:slug.trim().toLowerCase().replace(/\s+/g, "-"),
+            h1:heading,
             metaDescription,
             scriptTags
         })
@@ -98,7 +101,6 @@ export const addblog=async (req, res) => {
         return res.status(200).json({
             success: true,
             message: 'Blog added successfully',
-
         })
 
     } catch (err) {
@@ -115,7 +117,7 @@ export const editblogdetails=async (req, res) => {
         const { content, formData, id } = req.body
 
         const { title, metaDescription = "", scriptTags = [],
-            thumbnail = "" } = formData
+            thumbnail = "".heading="",slug } = formData
 
         if (!id) {
             return res.status(200).json({
@@ -125,7 +127,7 @@ export const editblogdetails=async (req, res) => {
         }
 
 
-        if (!title || !content) {
+        if (!title || !content || ! slug) {
             return res.status(200).json({
                 success: false,
                 message: 'title and content are necessary to save blog',
@@ -137,6 +139,8 @@ export const editblogdetails=async (req, res) => {
             thumbnail,
             content,
             metaDescription,
+            slug:slug.trim().toLowerCase().replace(/\s+/g, "-"),
+            h1:heading,
             scriptTags
         })
 

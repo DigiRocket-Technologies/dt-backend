@@ -5,6 +5,14 @@ const blogSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  slug:{
+    type:String,
+    required:true,
+    unique:true
+  },
+  h1:{
+    type:String,
+  },
   content: {
     type: String, // stores HTML content
     required: true,
