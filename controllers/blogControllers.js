@@ -6,8 +6,6 @@ export const getallblogsadmin = async (req, res) => {
 
         const blogs = await Blog.find({});
 
-        console.log(blogs);
-
         return res.status(200).json({
             success: true,
             message: 'User logged in successfully',
@@ -117,7 +115,7 @@ export const editblogdetails=async (req, res) => {
         const { content, formData, id } = req.body
 
         const { title, metaDescription = "", scriptTags = [],
-            thumbnail = "".heading="",slug } = formData
+            thumbnail = "",heading="",slug } = formData
 
         if (!id) {
             return res.status(200).json({
