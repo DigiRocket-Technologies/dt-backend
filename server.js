@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import multer from "multer";
+import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken"
 import { connectDB } from "./config/db.js";
 import blogRoutes from "./routes/blogRoutes.js"
@@ -22,10 +23,12 @@ const PORT = process.env.PORT || 8000;
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
+    credentials: true,
     allowedHeaders: ["Content-Type", "Accept-Type", "Authorization"],
     methods: ["GET", "POST", "PUT","DELETE"],
   })
 );
+app.use(cookieParser());
 
 app.use(express.json({ limit: "10mb" }));
 
@@ -948,49 +951,50 @@ app.post("/api/v1/commonform", (req, res) => {
   }
 });
 
-app.post("/api/v1/login", (req, res) => {
-
+export const login = async (req, res) => {
   try {
-
     const { password } = req.body;
-
-    if (!password) {
-      return res.status(400).json({
-        success: false,
-        message: "Password can't be empty"
-      })
-    }
-
     if (password !== process.env.PASSWORD) {
-      return res.status(400).json({
-        success: false,
-        message: "Wrong Password"
-      })
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
-    const token = jwt.sign(
-      {
-        user: "admin"
-      },
-      process.env.JWT_SECRET_KEY,
-      { expiresIn: '7d' }
-    );
+    const token = jwt.sign({ role: "admin" }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "3h",
+    });
 
+    res.cookie("auth_tokens", token, {
+      httpOnly: true,
+      secure: true, 
+      sameSite: "Strict",
+      maxAge: 3 * 60 * 60 * 1000, 
+    });
 
-    return res.status(200).json({
-      success: true,
-      message: 'User logged in successfully',
-      token
-    })
-
+    return res.status(200).json({ success: true, message: "Login successful" });
   } catch (err) {
-    console.log('Error in login controller', err)
-    return res.status(500).json({
-      success: false,
-      message: 'Internal Server Error'
-    })
+    console.log("Login error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
-})
+};
+app.post("/api/v1/login", login);
+
+
+app.get("/checkauth", (req, res) => {
+  try {
+    const token = req.cookies.auth_tokens;
+    if (!token)
+      return res.status(401).json({ success: false, message: "No token provided" });
+
+    jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
+      if (err)
+        return res.status(401).json({ success: false, message: "Invalid or expired token" });
+
+      return res.status(200).json({ success: true, user: decoded });
+    });
+  } catch (err) {
+    console.log("Error in /checkauth:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
 
 app.listen(PORT,  () => {
 

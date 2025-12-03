@@ -5,12 +5,12 @@ import { addblog, altervisibility, deleteblog, editblogdetails, getallblogs, get
 const router=express.Router();
 
 
-router.get("/getallblogsadmin",protectedRoute,getallblogsadmin);
+router.get("/getallblogsadmin",protectedRoute,getallblogsadmin); 
 router.get("/getallblogs",getallblogs);
 router.get("/getblogdetails/:slug",getblogdetails);
-router.post("/addblog",protectedRoute,addblog)
-router.put("/editblogdetails",protectedRoute,editblogdetails);
-router.delete("/deleteblog",protectedRoute,deleteblog);
-router.put("/altervisibility",protectedRoute,altervisibility)
+router.post("/addblog",protectedRoute,addblog) 
+router.put("/editblogdetails",protectedRoute,editblogdetails); 
+router.delete("/deleteblog",protectedRoute,deleteblog); 
+router.put("/altervisibility",protectedRoute,altervisibility);
 
-export default router
+export default router;

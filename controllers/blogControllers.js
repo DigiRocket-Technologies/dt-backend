@@ -7,7 +7,7 @@ export const getallblogsadmin = async (req, res) => {
 
         const blogs = await Blog.find({});
 
-        return res.status(200).json({
+        return res.status(200).json({ 
             success: true,
             message: 'User logged in successfully',
             blogs
@@ -43,35 +43,43 @@ export const getallblogs=async (req, res) => {
     }
 }
 
-export const getblogdetails=async (req, res) => {
-    try {
-        const slug = req.params.slug
-        if (!slug)
-            return res.status(400).json({
-                success: false,
-                message: 'No blog choosen '
-            })
-
-        const blog = await Blog.findOne({ slug });
-
-
-
-        return res.status(200).json({
-            success: true,
-            message: 'Blog details fetched successfully',
-            blog
-        })
-
-    } catch (err) {
-        console.log('Error in get blogs controller', err)
-        return res.status(500).json({
-            success: false,
-            message: 'Internal Server Error'
-        })
+export const getblogdetails = async (req, res) => {
+  try {
+    const slug = req.params.slug;
+    if (!slug) {
+      return res.status(400).json({
+        success: false,
+        message: 'No blog chosen',
+      });
     }
-}
+
+    const blog = await Blog.findOne({ slug });
+
+    if (!blog) {
+      return res.status(404).json({
+        success: false,
+        message: 'Blog not found',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Blog details fetched successfully',
+      blog,
+    });
+
+  } catch (err) {
+    console.log('Error in get blog details controller', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+    });
+  }
+};
+
 
 export const addblog=async (req, res) => {
+    // console.log(req.body);
     try {
         const { content, formData } = req.body
 
@@ -86,13 +94,13 @@ export const addblog=async (req, res) => {
         }
 
         const blog = new Blog({
-            title,
+            title:heading,
             thumbnail,
             content,
             slug:slug.trim().toLowerCase().replace(/\s+/g, "-"),
-            h1:heading,
+            h1:title,
             metaDescription,
-            scriptTags
+            scripts: scriptTags
         })
 
         await blog.save();
@@ -111,52 +119,82 @@ export const addblog=async (req, res) => {
     }
 }
 
-export const editblogdetails=async (req, res) => {
-    try {
-        const { content, formData, id } = req.body
+export const editblogdetails = async (req, res) => {
+  try {
+    const { content, formData, id } = req.body;
+    const {
+      title,
+      metaDescription = "",
+      scriptTags = [],
+      thumbnail = "",
+      heading = "",
+      slug,
+    } = formData;
 
-        const { title, metaDescription = "", scriptTags = [],
-            thumbnail = "",heading="",slug } = formData
-
-        if (!id) {
-            return res.status(200).json({
-                success: false,
-                message: 'No blog choosen to edit',
-            })
-        }
-
-
-        if (!title || !content || ! slug) {
-            return res.status(200).json({
-                success: false,
-                message: 'title and content are necessary to save blog',
-            })
-        }
-
-        const blog = await Blog.findOneAndUpdate({ _id: id }, {
-            title,
-            thumbnail,
-            content,
-            metaDescription,
-            slug:slug.trim().toLowerCase().replace(/\s+/g, "-"),
-            h1:heading,
-            scriptTags
-        })
-
-        return res.status(200).json({
-            success: true,
-            message: 'Blog edited sucessfully',
-            blog
-        })
-
-    } catch (err) {
-        console.log('Error in edit blog controller', err)
-        return res.status(500).json({
-            success: false,
-            message: 'Internal Server Error'
-        })
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "No blog chosen to edit",
+      });
     }
-}
+
+    if (!title || !content || !slug) {
+      return res.status(400).json({
+        success: false,
+        message: "Title, slug, and content are required",
+      });
+    }
+
+    const normalizedSlug = slug.trim().toLowerCase().replace(/\s+/g, "-");
+
+    // 🧠 Check if another blog already uses this slug
+    const existingSlug = await Blog.findOne({
+      slug: normalizedSlug,
+      _id: { $ne: id }, // exclude current blog
+    });
+
+    if (existingSlug) {
+      return res.status(400).json({
+        success: false,
+        message: `Slug "${normalizedSlug}" is already in use by another blog`,
+      });
+    }
+
+    // 🛠️ Now safely update
+    const blog = await Blog.findOneAndUpdate(
+      { _id: id },
+      {
+        title,
+        thumbnail,
+        content,
+        metaDescription,
+        slug: normalizedSlug,
+        h1: heading,
+        scripts: scriptTags,
+      },
+      { new: true }
+    );
+
+    if (!blog) {
+      return res.status(404).json({
+        success: false,
+        message: "Blog not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Blog edited successfully",
+      blog,
+    });
+  } catch (err) {
+    console.error("Error in edit blog controller:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
 
 export const deleteblog= async (req, res) => {
     try {
