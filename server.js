@@ -959,14 +959,14 @@ export const login = async (req, res) => {
     }
 
     const token = jwt.sign({ role: "admin" }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "3h",
+      expiresIn: "7h",
     });
 
     res.cookie("auth_tokens", token, {
       httpOnly: true,
       secure: true, 
-      sameSite: "Strict",
-      maxAge: 3 * 60 * 60 * 1000, 
+      sameSite: "none",
+      maxAge: 7 * 60 * 60 * 1000, 
     });
 
     return res.status(200).json({ success: true, message: "Login successful" });
