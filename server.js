@@ -30,14 +30,12 @@ app.use(
       "Accept", 
       "Authorization",
       "X-Requested-With",
-      "Access-Control-Allow-Credentials"
+      "Access-Control-Allow-Credentials",
+      "Access-Control-Allow-Origin"
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
 );
-
-// Handle preflight requests for all routes
-app.options('*', cors());
 
 app.use(cookieParser());
 
