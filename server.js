@@ -22,12 +22,13 @@ const PORT = process.env.PORT || 8000;
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: "https://digirocket.io",
     credentials: true,
     allowedHeaders: ["Content-Type", "Accept", "Authorization"],
     methods: ["GET", "POST", "PUT","DELETE"],
   })
 );
+
 app.use(cookieParser());
 
 app.use(express.json({ limit: "10mb" }));
