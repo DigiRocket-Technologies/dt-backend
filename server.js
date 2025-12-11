@@ -35,7 +35,7 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
 );
- 
+
 // Handle preflight requests for all routes
 app.options('*', cors());
 
