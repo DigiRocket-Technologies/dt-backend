@@ -989,7 +989,7 @@ export const login = async (req, res) => {
 app.post("/api/v1/login", login);
 
 
-app.get("/checkauth", (req, res) => {
+app.get("/api/v1/checkauth", (req, res) => {
   try {
     const token = req.cookies.auth_tokens;
     if (!token)
