@@ -26,12 +26,10 @@ app.use(
     origin: ['https://digirocket.io', 'https://www.digirocket.io'],
     credentials: true,
     allowedHeaders: [
-      "Content-Type", 
-      "Accept", 
+      "Content-Type",
+      "Accept",
       "Authorization",
-      "X-Requested-With",
-      "Access-Control-Allow-Credentials",
-      "Access-Control-Allow-Origin"
+      "X-Requested-With"
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
