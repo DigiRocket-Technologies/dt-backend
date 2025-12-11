@@ -1003,7 +1003,12 @@ app.get("/api/v1/checkauth", (req, res) => {
   }
 });
 
-app.listen(PORT,  () => {
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server is running at ${PORT}`);
+  });
+}
 
-  console.log(`Server is running at ${PORT}`);
-});
+// Export for Vercel serverless
+export default app;
