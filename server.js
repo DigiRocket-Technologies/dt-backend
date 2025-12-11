@@ -21,15 +21,23 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 
 
-// app.use(
-//   cors({
-//     origin: process.env.FRONTEND_URL,
-//     credentials: true,
-//     allowedHeaders: ["Content-Type", "Accept", "Authorization"],
-//     methods: ["GET", "POST", "PUT","DELETE"],
-//   })
-// );
-app.use(cors());
+app.use(
+  cors({
+    origin: ['https://digirocket.io', 'https://www.digirocket.io'],
+    credentials: true,
+    allowedHeaders: [
+      "Content-Type", 
+      "Accept", 
+      "Authorization",
+      "X-Requested-With",
+      "Access-Control-Allow-Credentials"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  })
+);
+ 
+// Handle preflight requests for all routes
+app.options('*', cors());
 
 app.use(cookieParser());
 
