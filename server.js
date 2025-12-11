@@ -24,7 +24,7 @@ app.use(
   cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
-    allowedHeaders: ["Content-Type", "Accept-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Accept", "Authorization"],
     methods: ["GET", "POST", "PUT","DELETE"],
   })
 );
@@ -965,7 +965,7 @@ export const login = async (req, res) => {
     res.cookie("auth_tokens", token, {
       httpOnly: true,
       secure: true, 
-      sameSite: "none",
+      sameSite: "None",
       maxAge: 7 * 60 * 60 * 1000, 
     });
 
