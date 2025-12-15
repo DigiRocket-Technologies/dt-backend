@@ -1034,15 +1034,15 @@ app.post("/api/v1/refresh", (req, res) => {
 });
 
 
-// if (process.env.NODE_ENV !== 'production') {
-//   app.listen(PORT, () => {
-//     console.log(`Server is running at ${PORT}`);
-//   });
-// }
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server is running at ${PORT}`);
+  });
+}
 
-app.listen(PORT, () => {
-  console.log(`Server is running at ${PORT}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`Server is running at ${PORT}`);
+// });
 
 export default app;
 
