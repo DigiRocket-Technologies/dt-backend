@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 8000;
 
 app.use(
   cors({
-    origin: ['https://digirocket.io', 'https://www.digirocket.io'],
+    origin: ['https://digirocket.io', 'https://www.digirocket.io', "http://localhost:5173"],
     credentials: true,
     allowedHeaders: [
       "Content-Type",
@@ -965,23 +965,37 @@ export const login = async (req, res) => {
       return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ role: "admin" }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "7h",
+    const accessToken = jwt.sign({ role: "admin" }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "1h",
     });
 
-    // Return token in response body for cross-domain compatibility
-    return res.status(200).json({ success: true, message: "Login successful", token });
+    const refreshToken = jwt.sign({ role: "admin" }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "30d", 
+    });
+
+    res.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 30 * 24 * 60 * 60 * 1000, 
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token: accessToken,
+    });
   } catch (err) {
     console.log("Login error:", err);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 app.post("/api/v1/login", login);
 
 
 app.get("/api/v1/checkauth", (req, res) => {
   try {
-    // Check for token in Authorization header first, then fall back to cookies
     const authHeader = req.headers.authorization;
     const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : req.cookies.auth_tokens;
 
@@ -1000,11 +1014,35 @@ app.get("/api/v1/checkauth", (req, res) => {
   }
 });
 
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`Server is running at ${PORT}`);
+app.post("/api/v1/refresh", (req, res) => {
+  const refreshToken = req.cookies.refresh_token;
+  if (!refreshToken)
+    return res.status(401).json({ success: false, message: "No refresh token" });
+
+  jwt.verify(refreshToken, process.env.JWT_SECRET_KEY, (err, decoded) => {
+    if (err)
+      return res.status(401).json({ success: false, message: "Invalid or expired refresh token" });
+
+    const newAccessToken = jwt.sign(
+      { role: decoded.role },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "1h" }
+    );
+
+    return res.status(200).json({ success: true, token: newAccessToken });
   });
-}
+});
+
+
+// if (process.env.NODE_ENV !== 'production') {
+//   app.listen(PORT, () => {
+//     console.log(`Server is running at ${PORT}`);
+//   });
+// }
+
+app.listen(PORT, () => {
+  console.log(`Server is running at ${PORT}`);
+});
 
 export default app;
 
