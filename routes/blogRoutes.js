@@ -1,11 +1,12 @@
 import express from "express";
-import { addblog, altervisibility, deleteblog, editblogdetails, getallblogs, getallblogsadmin, getblogdetails } from "../controllers/blogControllers.js";
+import { addblog, altervisibility, deleteblog, editblogdetails, getallblogs, getallblogsadmin, getblogdetails, getallblogsadminSearch } from "../controllers/blogControllers.js";
 
 const router=express.Router();
 
 
-router.get("/getallblogsadmin",getallblogsadmin); 
-router.get("/getallblogs",getallblogs);
+router.get("/getallblogsadmin/:ToggleValue/:pageNo/:sortNo",getallblogsadmin); 
+router.get("/getallblogsadminSearch", getallblogsadminSearch);
+router.get("/getallblogs/:pageNo",getallblogs);
 router.get("/getblogdetails/:slug",getblogdetails);
 router.post("/addblog",addblog) 
 router.put("/editblogdetails",editblogdetails); 

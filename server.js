@@ -6,7 +6,7 @@ import multer from "multer";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken"
 import { connectDB } from "./config/db.js";
-import blogRoutes from "./routes/blogRoutes.js"
+import blogRoutes from "./routes/blogRoutes.js";
 
 const upload = multer({
   storage: multer.memoryStorage(),
