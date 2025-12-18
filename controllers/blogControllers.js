@@ -1,10 +1,11 @@
 import Blog from "../models/blog.js";
+import { connectDB } from "../config/db.js";
 
 export const getallblogsadmin = async (req, res) => {
-  const { ToggleValue, pageNo, sortNo } = req.params;
-
   try {
-    const skipNumber = (pageNo - 1) * 5;
+    await connectDB();
+    const { ToggleValue, pageNo, sortNo } = req.params;
+    const skipNumber = (pageNo - 1) * 6;
 
     let query = {};
     let sortOption = { [ToggleValue]: parseInt(sortNo) };
@@ -21,9 +22,9 @@ export const getallblogsadmin = async (req, res) => {
     const blogs = await Blog.find(query)
       .sort(sortOption)
       .skip(skipNumber)
-      .limit(5);
+      .limit(6);
 
-    const noOfPage = Math.ceil(blogSize / 5);
+    const noOfPage = Math.ceil(blogSize / 6);
 
     return res.status(200).json({
       success: true,
@@ -42,57 +43,57 @@ export const getallblogsadmin = async (req, res) => {
 };
 
 export const getallblogsadminSearch = async (req, res) => {
-
   try {
+    await connectDB();
     const blogs = await Blog.find({});
-
     return res.status(200).json({
       success: true,
       blogs,
-    })
-
+    });
   } catch (err) {
-    console.log('Error in get blogs controller', err)
+    console.log("Error in get blogs controller", err);
     return res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
-    })
+      message: "Internal Server Error",
+    });
   }
-}
+};
 
 export const getallblogs = async (req, res) => {
   const { pageNo } = req.params;
   try {
-    const skipNumber = (pageNo - 1) * 6;
-    const blogs = await Blog.find({ live: true }).skip(skipNumber)
-      .limit(6);
+    await connectDB();
+    const skipNumber = (pageNo - 1) * 10;
+    const blogs = await Blog.find({ live: true })
+      .skip(skipNumber)
+      .limit(10);
     const blogSize = await Blog.countDocuments({ live: true });
-    const noOfPage = Math.ceil(blogSize / 6);
+    const noOfPage = Math.ceil(blogSize / 10);
 
     return res.status(200).json({
       success: true,
-      message: 'User logged in successfully',
+      message: "Blogs fetched successfully",
       blogs,
       noOfPage,
-      blogSize
-    })
-
+      blogSize, 
+    });
   } catch (err) {
-    console.log('Error in get blogs controller', err)
+    console.log("Error in get blogs controller", err);
     return res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
-    })
+      message: "Internal Server Error",
+    });
   }
-}
+};
 
 export const getblogdetails = async (req, res) => {
   try {
+    await connectDB();
     const slug = req.params.slug;
     if (!slug) {
       return res.status(400).json({
         success: false,
-        message: 'No blog chosen',
+        message: "No blog chosen",
       });
     }
 
@@ -101,39 +102,43 @@ export const getblogdetails = async (req, res) => {
     if (!blog) {
       return res.status(404).json({
         success: false,
-        message: 'Blog not found',
+        message: "Blog not found",
       });
     }
 
     return res.status(200).json({
       success: true,
-      message: 'Blog details fetched successfully',
+      message: "Blog details fetched successfully",
       blog,
     });
-
   } catch (err) {
-    console.log('Error in get blog details controller', err);
+    console.log("Error in get blog details controller", err);
     return res.status(500).json({
       success: false,
-      message: 'Internal Server Error',
+      message: "Internal Server Error",
     });
   }
 };
 
-
 export const addblog = async (req, res) => {
-  // console.log(req.body);
   try {
-    const { content, formData } = req.body
+    await connectDB();
+    const { content, formData } = req.body;
 
-    const { title, metaDescription = "", scriptTags = [],
-      thumbnail = "", slug, heading = "" } = formData
+    const {
+      title,
+      metaDescription = "",
+      scriptTags = [],
+      thumbnail = "",
+      slug,
+      heading = "",
+    } = formData;
 
     if (!title || !content || !slug) {
       return res.status(200).json({
         success: false,
-        message: 'title and content are necessary to save blog',
-      })
+        message: "Title and content are necessary to save blog",
+      });
     }
 
     const blog = new Blog({
@@ -143,27 +148,27 @@ export const addblog = async (req, res) => {
       slug: slug.trim().toLowerCase().replace(/\s+/g, "-"),
       h1: title,
       metaDescription,
-      scripts: scriptTags
-    })
+      scripts: scriptTags,
+    });
 
     await blog.save();
 
     return res.status(200).json({
       success: true,
-      message: 'Blog added successfully',
-    })
-
+      message: "Blog added successfully",
+    });
   } catch (err) {
-    console.log('Error in add blog controller', err)
+    console.log("Error in add blog controller", err);
     return res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
-    })
+      message: "Internal Server Error",
+    });
   }
-}
+};
 
 export const editblogdetails = async (req, res) => {
   try {
+    await connectDB();
     const { content, formData, id } = req.body;
     const {
       title,
@@ -190,10 +195,10 @@ export const editblogdetails = async (req, res) => {
 
     const normalizedSlug = slug.trim().toLowerCase().replace(/\s+/g, "-");
 
-    // 🧠 Check if another blog already uses this slug
+    // Check if another blog already uses this slug
     const existingSlug = await Blog.findOne({
       slug: normalizedSlug,
-      _id: { $ne: id }, // exclude current blog
+      _id: { $ne: id },
     });
 
     if (existingSlug) {
@@ -203,7 +208,7 @@ export const editblogdetails = async (req, res) => {
       });
     }
 
-    // 🛠️ Now safely update
+    // Update blog
     const blog = await Blog.findOneAndUpdate(
       { _id: id },
       {
@@ -241,63 +246,66 @@ export const editblogdetails = async (req, res) => {
 
 export const deleteblog = async (req, res) => {
   try {
-    const { id } = req.body
+    await connectDB();
+    const { id } = req.body;
 
     if (!id) {
       return res.status(200).json({
         success: false,
-        message: 'No blog choosen to delete',
-      })
+        message: "No blog chosen to delete",
+      });
     }
 
-    const blog = await Blog.findOneAndDelete({ _id: id })
+    const blog = await Blog.findOneAndDelete({ _id: id });
 
     return res.status(200).json({
       success: true,
-      message: 'Blog deleted sucessfully',
-      blog
-    })
-
+      message: "Blog deleted successfully",
+      blog,
+    });
   } catch (err) {
-    console.log('Error in delete blog controller', err)
+    console.log("Error in delete blog controller", err);
     return res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
-    })
+      message: "Internal Server Error",
+    });
   }
-}
+};
 
 export const altervisibility = async (req, res) => {
   try {
-    const { id } = req.body
+    await connectDB();
+    const { id } = req.body;
 
     if (!id) {
       return res.status(200).json({
         success: false,
-        message: 'No blog choosen to alter visibilty',
-      })
+        message: "No blog chosen to alter visibility",
+      });
     }
 
-    const blog = await Blog.findOne({ _id: id })
+    const blog = await Blog.findOne({ _id: id });
 
-    if (blog?.live === false)
-      blog.live = true;
-    else
-      blog.live = false;
+    if (!blog) {
+      return res.status(404).json({
+        success: false,
+        message: "Blog not found",
+      });
+    }
 
+    blog.live = !blog.live;
     await blog.save();
 
     return res.status(200).json({
       success: true,
-      message: 'Blogs visibility altered sucessfully',
-      blog
-    })
-
+      message: "Blog visibility altered successfully",
+      blog,
+    });
   } catch (err) {
-    console.log('Error in alter blog visibilty controller', err)
+    console.log("Error in alter blog visibility controller", err);
     return res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
-    })
+      message: "Internal Server Error",
+    });
   }
-}
+};
