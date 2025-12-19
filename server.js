@@ -38,7 +38,10 @@ app.use(cookieParser());
 
 app.use(express.json({ limit: "10mb" }));
 
-connectDB();
+const startServer = async() => {
+  await connectDB();
+}
+startServer();
 
 export const login = async (req, res) => {
   try {
