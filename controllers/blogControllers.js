@@ -1,9 +1,7 @@
 import Blog from "../models/blog.js";
-import { connectDB } from "../config/db.js";
 
 export const getallblogsadmin = async (req, res) => {
   try {
-    await connectDB();
     const { ToggleValue, pageNo, sortNo } = req.params;
     const skipNumber = (pageNo - 1) * 6;
 
@@ -44,7 +42,6 @@ export const getallblogsadmin = async (req, res) => {
 
 export const getallblogsadminSearch = async (req, res) => {
   try {
-    await connectDB();
     const blogs = await Blog.find({});
     return res.status(200).json({
       success: true,
@@ -62,7 +59,6 @@ export const getallblogsadminSearch = async (req, res) => {
 export const getallblogs = async (req, res) => {
   const { pageNo } = req.params;
   try {
-    await connectDB();
     const skipNumber = (pageNo - 1) * 10;
     const blogs = await Blog.find({ live: true })
       .skip(skipNumber)
@@ -75,7 +71,7 @@ export const getallblogs = async (req, res) => {
       message: "Blogs fetched successfully",
       blogs,
       noOfPage,
-      blogSize, 
+      blogSize,
     });
   } catch (err) {
     console.log("Error in get blogs controller", err);
@@ -88,7 +84,6 @@ export const getallblogs = async (req, res) => {
 
 export const getblogdetails = async (req, res) => {
   try {
-    await connectDB();
     const slug = req.params.slug;
     if (!slug) {
       return res.status(400).json({
@@ -122,7 +117,6 @@ export const getblogdetails = async (req, res) => {
 
 export const addblog = async (req, res) => {
   try {
-    await connectDB();
     const { content, formData } = req.body;
 
     const {
@@ -168,7 +162,6 @@ export const addblog = async (req, res) => {
 
 export const editblogdetails = async (req, res) => {
   try {
-    await connectDB();
     const { content, formData, id } = req.body;
     const {
       title,
@@ -246,7 +239,6 @@ export const editblogdetails = async (req, res) => {
 
 export const deleteblog = async (req, res) => {
   try {
-    await connectDB();
     const { id } = req.body;
 
     if (!id) {
@@ -274,7 +266,6 @@ export const deleteblog = async (req, res) => {
 
 export const altervisibility = async (req, res) => {
   try {
-    await connectDB();
     const { id } = req.body;
 
     if (!id) {
