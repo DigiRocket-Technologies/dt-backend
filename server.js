@@ -41,8 +41,68 @@ app.use(cookieParser());
 
 app.use(express.json({ limit: "10mb" }));
 
-connectDB();
+const startServer = async() => {
+  await connectDB();
+}
+startServer();
 
+// export const login = async (req, res) => {
+//   try {
+//     const { password } = req.body;
+//     if (password !== process.env.PASSWORD) {
+//       return res.status(401).json({ success: false, message: "Invalid credentials" });
+//     }
+
+//     const accessToken = jwt.sign({ role: "admin" }, process.env.JWT_SECRET_KEY, {
+//       expiresIn: "1h",
+//     });
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Login successful",
+//       token: accessToken,
+//     });
+//   } catch (err) {
+//     console.log("Login error:", err);
+//     return res.status(500).json({ success: false, message: "Server error" });
+//   }
+// };
+
+// app.post("/api/v1/login", login);
+
+// app.get("/api/v1/checkauth", (req, res) => {
+//   try {
+//     const authHeader = req.headers.authorization;
+//     if (!authHeader || !authHeader.startsWith("Bearer ")) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "No token provided",
+//       });
+//     }
+
+//     const token = authHeader.split(" ")[1];
+
+//     jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
+//       if (err) {
+//         return res.status(401).json({
+//           success: false,
+//           message: "Invalid or expired token",
+//         });
+//       }
+
+//       return res.status(200).json({
+//         success: true,
+//         user: decoded,
+//       });
+//     });
+//   } catch (err) {
+//     console.log("Error in /checkauth:", err);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Server error",
+//     });
+//   }
+// });
 app.use("/api/v1/blog",blogRoutes)
 
 app.get("/", (req, res) => {
@@ -960,82 +1020,6 @@ app.post("/api/v1/commonform", (req, res) => {
   }
 });
 
-export const login = async (req, res) => {
-  try {
-    const { password } = req.body;
-    if (password !== process.env.PASSWORD) {
-      return res.status(401).json({ success: false, message: "Invalid credentials" });
-    }
-
-    const accessToken = jwt.sign({ role: "admin" }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "1h",
-    });
-
-    const refreshToken = jwt.sign({ role: "admin" }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "30d", 
-    });
-
-    res.cookie("refresh_token", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-      maxAge: 30 * 24 * 60 * 60 * 1000, 
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "Login successful",
-      token: accessToken,
-    });
-  } catch (err) {
-    console.log("Login error:", err);
-    return res.status(500).json({ success: false, message: "Server error" });
-  }
-};
-
-app.post("/api/v1/login", login);
-
-
-app.get("/api/v1/checkauth", (req, res) => {
-  try {
-    const authHeader = req.headers.authorization;
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : req.cookies.auth_tokens;
-
-    if (!token)
-      return res.status(401).json({ success: false, message: "No token provided" });
-
-    jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
-      if (err)
-        return res.status(401).json({ success: false, message: "Invalid or expired token" });
-
-      return res.status(200).json({ success: true, user: decoded });
-    });
-  } catch (err) {
-    console.log("Error in /checkauth:", err);
-    return res.status(500).json({ success: false, message: "Server error" });
-  }
-});
-
-app.post("/api/v1/refresh", (req, res) => {
-  const refreshToken = req.cookies.refresh_token;
-  if (!refreshToken)
-    return res.status(401).json({ success: false, message: "No refresh token" });
-
-  jwt.verify(refreshToken, process.env.JWT_SECRET_KEY, (err, decoded) => {
-    if (err)
-      return res.status(401).json({ success: false, message: "Invalid or expired refresh token" });
-
-    const newAccessToken = jwt.sign(
-      { role: decoded.role },
-      process.env.JWT_SECRET_KEY,
-      { expiresIn: "1h" }
-    );
-
-    return res.status(200).json({ success: true, token: newAccessToken });
-  });
-});
-
-
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
     console.log(`Server is running at ${PORT}`);
@@ -1048,5 +1032,80 @@ if (process.env.NODE_ENV !== 'production') {
 
 export default app;
 
+
+// export const login = async (req, res) => {
+//   try {
+//     const { password } = req.body;
+//     if (password !== process.env.PASSWORD) {
+//       return res.status(401).json({ success: false, message: "Invalid credentials" });
+//     }
+
+//     const accessToken = jwt.sign({ role: "admin" }, process.env.JWT_SECRET_KEY, {
+//       expiresIn: "1h",
+//     });
+
+//     const refreshToken = jwt.sign({ role: "admin" }, process.env.JWT_SECRET_KEY, {
+//       expiresIn: "30d", 
+//     });
+
+//     res.cookie("refresh_token", refreshToken, {
+//       httpOnly: true,
+//       secure: true,
+//       sameSite: "None",
+//       maxAge: 30 * 24 * 60 * 60 * 1000, 
+//     });
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Login successful",
+//       token: accessToken,
+//     });
+//   } catch (err) {
+//     console.log("Login error:", err);
+//     return res.status(500).json({ success: false, message: "Server error" });
+//   }
+// };
+
+// app.post("/api/v1/login", login);
+
+
+// app.get("/api/v1/checkauth", (req, res) => {
+//   try {
+//     const authHeader = req.headers.authorization;
+//     const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : req.cookies.auth_tokens;
+
+//     if (!token)
+//       return res.status(401).json({ success: false, message: "No token provided" });
+
+//     jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
+//       if (err)
+//         return res.status(401).json({ success: false, message: "Invalid or expired token" });
+
+//       return res.status(200).json({ success: true, user: decoded });
+//     });
+//   } catch (err) {
+//     console.log("Error in /checkauth:", err);
+//     return res.status(500).json({ success: false, message: "Server error" });
+//   }
+// });
+
+// app.post("/api/v1/refresh", (req, res) => {
+//   const refreshToken = req.cookies.refresh_token;
+//   if (!refreshToken)
+//     return res.status(401).json({ success: false, message: "No refresh token" });
+
+//   jwt.verify(refreshToken, process.env.JWT_SECRET_KEY, (err, decoded) => {
+//     if (err)
+//       return res.status(401).json({ success: false, message: "Invalid or expired refresh token" });
+
+//     const newAccessToken = jwt.sign(
+//       { role: decoded.role },
+//       process.env.JWT_SECRET_KEY,
+//       { expiresIn: "1h" }
+//     );
+
+//     return res.status(200).json({ success: true, token: newAccessToken });
+//   });
+// });
 
 
