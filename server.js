@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 8000;
 
 app.use(
   cors({
-    origin: ["https://digirocket.io", "https://www.digirocket.io", "http://localhost:5173"],
+    origin: ["https://digirocket.io", "https://www.digirocket.io"],
     credentials: true,
     allowedHeaders: [
       "Content-Type",
