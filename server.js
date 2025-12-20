@@ -23,17 +23,18 @@ const PORT = process.env.PORT || 8000;
 
 app.use(
   cors({
-    origin: ['https://digirocket.io', 'https://www.digirocket.io', "http://localhost:5173"],
+    origin: ["https://digirocket.io", "https://www.digirocket.io", "http://localhost:5173"],
     credentials: true,
     allowedHeaders: [
       "Content-Type",
       "Accept",
       "Authorization",
-      "X-Requested-With"
+      "X-Requested-With",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
 );
+
 
 app.use(cookieParser());
 
