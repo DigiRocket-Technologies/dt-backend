@@ -1,4 +1,5 @@
-import UserModel from "../models/user";
+import UserModel from "../models/user.js";
+import bcrypt from 'bcrypt';
 
 export const addUser = async(req, res) => {
     const { firstName, lastName, email, password, gender } = req.body;
@@ -11,8 +12,11 @@ export const addUser = async(req, res) => {
       if(checkEmail) {
         return res.status(400).json({success: false, message: "Please Enter Valid Details"});
       }
+
+      const emailTrimmed = email.trim().toLowerCase();
+      const hashPassword = await bcrypt.hash(password.trim(), 10);
       const user = await UserModel.create({
-        firstName, lastName, email, password, gender
+        firstName, lastName, email:emailTrimmed, password: hashPassword, gender
       })
 
       res.status(200).json({success: true, message: "User Added Succesful"});
