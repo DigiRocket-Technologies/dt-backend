@@ -27,15 +27,12 @@ app.use(
   cors({
     origin: ["https://digirocket.io", "https://www.digirocket.io", "http://localhost:5173"],
     credentials: true,
-    allowedHeaders: [
-      "Content-Type",
-      "Accept",
-      "Authorization",
-      "X-Requested-With",
-    ],
+    allowedHeaders: ["Content-Type", "Accept", "Authorization", "X-Requested-With"],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
 );
+
+app.options(/.*/, cors());
 
 app.use(cookieParser());
 app.use(express.json({ limit: "10mb" }));
