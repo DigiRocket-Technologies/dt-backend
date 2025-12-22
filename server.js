@@ -38,10 +38,7 @@ app.use(
 );
 
 app.use(cookieParser());
-
 app.use(express.json({ limit: "10mb" }));
-
-connectDB();
 
 app.use("/api/v1/login", loginRoutes);
 app.use("/api/v1/admin", adminRoutes);
@@ -1008,6 +1005,16 @@ app.post("/api/v1/commonform", (req, res) => {
 //   }
 // });
 
-app.listen(PORT,  () => {
-  console.log(`Server is running at ${PORT}`);
-});
+const startServer = async () => {
+  try {
+    await connectDB(); 
+    app.listen(PORT, () => {
+      console.log(`✅ Server is running at port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("❌ Database connection failed:", err.message);
+    process.exit(1); 
+  }
+};
+
+startServer();
