@@ -47,6 +47,69 @@ app.use("/api/v1/login", loginRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/blog", blogRoutes);
+const startServer = async() => {
+  await connectDB();
+}
+startServer();
+
+// export const login = async (req, res) => {
+//   try {
+//     const { password } = req.body;
+//     if (password !== process.env.PASSWORD) {
+//       return res.status(401).json({ success: false, message: "Invalid credentials" });
+//     }
+
+//     const accessToken = jwt.sign({ role: "admin" }, process.env.JWT_SECRET_KEY, {
+//       expiresIn: "1h",
+//     });
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Login successful",
+//       token: accessToken,
+//     });
+//   } catch (err) {
+//     console.log("Login error:", err);
+//     return res.status(500).json({ success: false, message: "Server error" });
+//   }
+// };
+
+// app.post("/api/v1/login", login);
+
+// app.get("/api/v1/checkauth", (req, res) => {
+//   try {
+//     const authHeader = req.headers.authorization;
+//     if (!authHeader || !authHeader.startsWith("Bearer ")) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "No token provided",
+//       });
+//     }
+
+//     const token = authHeader.split(" ")[1];
+
+//     jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
+//       if (err) {
+//         return res.status(401).json({
+//           success: false,
+//           message: "Invalid or expired token",
+//         });
+//       }
+
+//       return res.status(200).json({
+//         success: true,
+//         user: decoded,
+//       });
+//     });
+//   } catch (err) {
+//     console.log("Error in /checkauth:", err);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Server error",
+//     });
+//   }
+// });
+app.use("/api/v1/blog",blogRoutes)
 
 app.get("/", (req, res) => {
   res.send("Hello World");
