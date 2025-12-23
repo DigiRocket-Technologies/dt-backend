@@ -1,6 +1,6 @@
 import express from "express";
 import { addblog, altervisibility, deleteblog, editblogdetails, getallblogs, getallblogsadmin, getblogdetails, getallblogsadminSearch } from "../controllers/blogControllers.js";
-import { getallblogs, getblogdetails } from "../controllers/blogControllers.js";
+// import { getallblogs, getblogdetails } from "../controllers/blogControllers.js";
 const router=express.Router();
 
 
