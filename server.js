@@ -41,10 +41,6 @@ app.use("/api/v1/login", loginRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/blog", blogRoutes);
-const startServer = async() => {
-  await connectDB();
-}
-startServer();
 
 // export const login = async (req, res) => {
 //   try {
@@ -1066,10 +1062,13 @@ app.post("/api/v1/commonform", (req, res) => {
 // });
 
 connectDB()
-  .then(() => {
-    app.listen(PORT, () => console.log(`✅ Server is running on port ${PORT}`));
-  })
-  .catch((err) => {
-    console.error("❌ Database connection failed:", err.message);
-    process.exit(1); 
-});
+  .then(() => console.log("✅ MongoDB connected successfully"))
+  .catch((err) => console.error("❌ Database connection failed:", err.message));
+
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running locally on port ${PORT}`);
+  });
+}
+
+export default app;
