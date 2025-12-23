@@ -11,37 +11,37 @@
 //   }
 // };
 
-// import mongoose from "mongoose";
-// export const connectDB = async () => {
-//   try {
-//     await mongoose.connect(
-//       process.env.MONGO_URI,
-//     );
-//     console.log("MongoDB connected successfully");
-//   } catch (error) {
-//     console.error("MongoDB connection error:", error);
-//   }
-// };
-
 import mongoose from "mongoose";
-
-let isConnected = false;
-
 export const connectDB = async () => {
-  if (isConnected) return; // already connected
-
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 5000,
-      bufferCommands: false,
-    });
-
-    isConnected = conn.connections[0].readyState === 1; // true if connected
-    console.log("✅ MongoDB connected successfully");
-  } catch (err) {
-    console.error("❌ MongoDB connection error:", err.message);
-    throw new Error("MongoDB connection failed");
+    await mongoose.connect(
+      process.env.MONGO_URI,
+    );
+    console.log("MongoDB connected successfully");
+  } catch (error) {
+    console.error("MongoDB connection error:", error);
   }
 };
+
+// import mongoose from "mongoose";
+
+// let isConnected = false;
+
+// export const connectDB = async () => {
+//   if (isConnected) return; // already connected
+
+//   try {
+//     const conn = await mongoose.connect(process.env.MONGO_URI, {
+//       serverSelectionTimeoutMS: 5000,
+//       bufferCommands: false,
+//     });
+
+//     isConnected = conn.connections[0].readyState === 1; // true if connected
+//     console.log("✅ MongoDB connected successfully");
+//   } catch (err) {
+//     console.error("❌ MongoDB connection error:", err.message);
+//     throw new Error("MongoDB connection failed");
+//   }
+// };
 
 
