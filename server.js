@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import multer from "multer";
 import cookieParser from "cookie-parser";
-import jwt from "jsonwebtoken"
+// import jwt from "jsonwebtoken"
 import { connectDB } from "./config/db.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import adminRoutes from './routes/adminRoutes.js';
@@ -1060,14 +1060,17 @@ app.post("/api/v1/commonform", (req, res) => {
 //   }
 // });
 
-connectDB()
-  .then(() => console.log("✅ MongoDB connected successfully"))
-  .catch((err) => console.error("❌ Database connection failed:", err.message));
+const startServer = async () => {
+  try {
+    await connectDB(); 
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("Failed to start server:", err);
+  }
+};
 
-if (!process.env.VERCEL) {
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running locally on port ${PORT}`);
-  });
-}
+startServer();
 
 export default app;
