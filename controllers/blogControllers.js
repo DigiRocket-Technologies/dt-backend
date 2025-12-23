@@ -1,5 +1,4 @@
 import Blog from "../models/blog.js";
-import { connectDB } from "../config/db.js";
 
 export const getallblogsadmin = async (req, res) => {
   try {
@@ -72,7 +71,7 @@ export const getallblogs = async (req, res) => {
       message: "Blogs fetched successfully",
       blogs,
       noOfPage,
-      blogSize, 
+      blogSize,
     });
   } catch (err) {
     console.log("Error in get blogs controller", err);
