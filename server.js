@@ -1065,16 +1065,11 @@ app.post("/api/v1/commonform", (req, res) => {
 //   }
 // });
 
-const startServer = async () => {
-  try {
-    await connectDB(); 
-    app.listen(PORT, () => {
-      console.log(`✅ Server is running at port ${PORT}`);
-    });
-  } catch (err) {
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => console.log(`✅ Server is running on port ${PORT}`));
+  })
+  .catch((err) => {
     console.error("❌ Database connection failed:", err.message);
     process.exit(1); 
-  }
-};
-
-startServer();
+});
