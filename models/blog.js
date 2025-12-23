@@ -14,24 +14,25 @@ const blogSchema = new mongoose.Schema({
     type:String,
   },
   content: {
-    type: String, // stores HTML content
+    type: String,
     required: true,
   },
   thumbnail: {
-    type: String, // Cloudinary image URL
+    type: String, 
   },
   metaDescription: {
     type: String,
   },
   scripts: {
-    type: [String], // array of script URLs or inline script strings
+    type: [String], 
     default: [],
   },
   live:{
     type:Boolean,
     default:false
-  }
-}, { timestamps: true }); // adds createdAt and updatedAt automatically
+  },
+  createdBy: { type: String, default: "Admin" }
+}, { timestamps: true }); 
 
 const Blog = mongoose.model('Blog', blogSchema);
 

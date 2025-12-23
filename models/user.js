@@ -6,7 +6,8 @@ const UserSchema = mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     gender: { type: String, required: true },
-    author: { type: String, default: ""}
+    userType: { type: String, default: "Employee"},
+    createdBy: { type: String, default: "Admin" }
 }, { timestamps: true })
 
 const UserModel = mongoose.model("user", UserSchema);

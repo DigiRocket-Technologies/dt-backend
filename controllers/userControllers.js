@@ -2,7 +2,7 @@ import UserModel from "../models/user.js";
 import bcrypt from 'bcrypt';
 
 export const addUser = async(req, res) => {
-    const { firstName, lastName, email, password, gender } = req.body;
+    const { firstName, lastName, email, password, gender, createdBy } = req.body;
 
     try {
       if(!firstName || !lastName || !email || !password || !gender) {
@@ -16,7 +16,7 @@ export const addUser = async(req, res) => {
       const emailTrimmed = email.trim().toLowerCase();
       const hashPassword = await bcrypt.hash(password.trim(), 10);
       const user = await UserModel.create({
-        firstName, lastName, email:emailTrimmed, password: hashPassword, gender
+        firstName, lastName, email:emailTrimmed, password: hashPassword, gender, createdBy
       })
 
       res.status(200).json({success: true, message: "User Added Succesful"});
@@ -25,18 +25,42 @@ export const addUser = async(req, res) => {
     }
 }
 
-export const getAllUser = async(req, res) => {
-    try {
-      const user = await UserModel.find({});
-      res.status(200).json({success: true, message: "User Fetched Successful", user})
-    } catch(err) {
-      res.status(500).json({success: false, message: err.message});
+export const getAllUser = async (req, res) => {
+  try {
+    const { pageNo } = req.params;
+    const limit = 6;
+    const skip = (pageNo - 1) * limit;
+
+    const total = await UserModel.countDocuments({})
+    const users = await UserModel.find({}).skip(skip).limit(limit);
+
+    res.status(200).json({
+      success: true,
+      message: "Users fetched successfully",
+      users,
+      noOfPage: Math.ceil(total / limit),
+      currentPage: pageNo
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const getAllUserSearch = async (req, res) => {
+  try {
+    const user = await UserModel.find({});
+    if(!user) {
+      return res.status(404).json({success: false, message: "User not Found"});
     }
+    res.status(200).json({success: true, message:"successful", user});
+  } catch(err) {
+    res.status(500).json({success:false, message: err.message});
+  }
 }
 
 export const updateUserById = async(req, res) => {
     const { id } = req.params;
-    const { firstName, lastName, email, password, gender } = req.body;
+    const { firstName, lastName, email, gender } = req.body;
   
     try {
       const user = await UserModel.findOne({_id: id});
@@ -44,7 +68,7 @@ export const updateUserById = async(req, res) => {
         return res.status(404).json({success: false, message:"User Not Found"});
       }
 
-      Object.assign(user,{firstName, lastName, email, password, gender});
+      Object.assign(user,{firstName, lastName, email, gender});
       await user.save();
 
       res.status(200).json({success: true, message: "User Updated successfully"})
@@ -82,5 +106,5 @@ export const getUserById = async(req, res) => {
       res.status(200).json({success: true, user});
     } catch(err) {
         res.status(500).json({success: false, message: err.message});
-    }
+   }
 }
