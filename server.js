@@ -99,7 +99,6 @@ app.use("/api/v1/blog", blogRoutes);
 //     });
 //   }
 // });
-app.use("/api/v1/blog",blogRoutes)
 
 app.get("/", (req, res) => {
   res.send("Hello World");
