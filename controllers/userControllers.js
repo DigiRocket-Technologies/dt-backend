@@ -5,6 +5,7 @@ export const addUser = async(req, res) => {
     const { firstName, lastName, email, password, gender, createdBy } = req.body;
 
     try {
+      const userType = "Employee";
       if(!firstName || !lastName || !email || !password || !gender) {
         return res.status(400).json({success: false, message: "Please Enter All Details"});
       }
@@ -16,7 +17,7 @@ export const addUser = async(req, res) => {
       const emailTrimmed = email.trim().toLowerCase();
       const hashPassword = await bcrypt.hash(password.trim(), 10);
       const user = await UserModel.create({
-        firstName, lastName, email:emailTrimmed, password: hashPassword, gender, createdBy
+        firstName, lastName, email:emailTrimmed, password: hashPassword, gender, createdBy, userType
       })
 
       res.status(200).json({success: true, message: "User Added Succesful"});

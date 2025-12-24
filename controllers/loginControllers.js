@@ -14,12 +14,12 @@ export const login = async (req, res) => {
 
         const token = jwt.sign({ id: user._id, email: user.email, author: user.author }, process.env.JWT_SECRET_KEY || "defaultsecret", { expiresIn: "7d" });
 
-        const { firstName, lastName, gender, author } = user;
+        const { firstName, userType } = user;
         res.status(200).json({
             success: true,
             message: "Login Successful",
             token,
-            user: { firstName, lastName, email, gender, author }
+            user: { firstName, userType }
         });
     } catch (err) {
         res.status(500).json({ success: false, message: "Internal Server Error", error: err.message });
