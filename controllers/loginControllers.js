@@ -2,10 +2,12 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import AdminModel from "../models/admin.js";
 import UserModel from "../models/user.js";
+import { connectDB } from '../config/db.js';
 
 export const login = async (req, res) => {
     const { email, password } = req.body;
     try {
+        await connectDB();
         let user = await AdminModel.findOne({ email }); if (!user) user = await UserModel.findOne({ email });
         if (!user) return res.status(404).json({ success: false, message: "User Not Found" });
 
@@ -26,8 +28,9 @@ export const login = async (req, res) => {
     }
 };
 
-export const verifyAuth = (req, res) => {
+export const verifyAuth = async (req, res) => {
     try {
+        await connectDB();
         const authHeader = req.headers.authorization;
         if (!authHeader)
             return res.status(401).json({ success: false, message: "No token provided" });
