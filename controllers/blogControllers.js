@@ -1,7 +1,9 @@
 import Blog from "../models/blog.js";
+import { connectDB } from '../config/db.js';
 
 export const getallblogsadmin = async (req, res) => {
   try {
+    await connectDB();
     const { ToggleValue, pageNo, sortNo } = req.params;
     const skipNumber = (pageNo - 1) * 6;
 
@@ -42,6 +44,7 @@ export const getallblogsadmin = async (req, res) => {
 
 export const getallblogsadminSearch = async (req, res) => {
   try {
+    await connectDB();
     const blogs = await Blog.find({});
     return res.status(200).json({
       success: true,
@@ -57,6 +60,7 @@ export const getallblogsadminSearch = async (req, res) => {
 };
 
 export const getallblogs = async (req, res) => {
+  await connectDB();
   const { pageNo } = req.params;
   try {
     const skipNumber = (pageNo - 1) * 10;
@@ -83,6 +87,7 @@ export const getallblogs = async (req, res) => {
 };
 
 export const getblogdetails = async (req, res) => {
+  await connectDB();
   try {
     const slug = req.params.slug;
     if (!slug) {
@@ -116,6 +121,7 @@ export const getblogdetails = async (req, res) => {
 };
 
 export const addblog = async (req, res) => {
+  await connectDB();
   try {
     const { content, formData, createdByData } = req.body;
 
@@ -166,6 +172,7 @@ export const addblog = async (req, res) => {
 };
 
 export const editblogdetails = async (req, res) => {
+  await connectDB();
   try {
     const { content, formData, id } = req.body;
     const {
@@ -243,6 +250,7 @@ export const editblogdetails = async (req, res) => {
 };
 
 export const deleteblog = async (req, res) => {
+  await connectDB();
   try {
     const { id } = req.body;
 
@@ -270,6 +278,7 @@ export const deleteblog = async (req, res) => {
 };
 
 export const altervisibility = async (req, res) => {
+  await connectDB();
   try {
     const { id } = req.body;
 

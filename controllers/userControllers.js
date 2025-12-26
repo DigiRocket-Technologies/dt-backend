@@ -1,8 +1,10 @@
 import UserModel from "../models/user.js";
+import { connectDB } from '../config/db.js';
 import bcrypt from 'bcrypt';
 
 export const addUser = async(req, res) => {
     const { firstName, lastName, email, password, gender, createdBy } = req.body;
+    await connectDB();
 
     try {
       const userType = "Employee";
@@ -28,6 +30,7 @@ export const addUser = async(req, res) => {
 
 export const getAllUser = async (req, res) => {
   try {
+    await connectDB();
     const { pageNo } = req.params;
     const limit = 6;
     const skip = (pageNo - 1) * limit;
@@ -49,6 +52,7 @@ export const getAllUser = async (req, res) => {
 
 export const getAllUserSearch = async (req, res) => {
   try {
+    await connectDB();
     const user = await UserModel.find({});
     if(!user) {
       return res.status(404).json({success: false, message: "User not Found"});
@@ -64,6 +68,7 @@ export const updateUserById = async(req, res) => {
     const { firstName, lastName, email, gender } = req.body;
   
     try {
+      await connectDB();
       const user = await UserModel.findOne({_id: id});
       if(!user) {
         return res.status(404).json({success: false, message:"User Not Found"});
@@ -82,6 +87,7 @@ export const deleteUser = async(req, res) => {
     const { id } = req.params;
 
     try {
+      await connectDB();
       const fUser = await UserModel.findOne({_id: id});
       if(!fUser) {
         return res.status(404).json({success: false, message: "User Not Found"});
@@ -99,6 +105,7 @@ export const getUserById = async(req, res) => {
     const { id } = req.params;
     
     try {
+      await connectDB();
       const user = await UserModel.findOne({_id: id});
       if(!user) {
         return res.status(404).json({success: false, message: "User Not Found"});
